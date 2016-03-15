@@ -84,6 +84,14 @@ object V2 {
       case Right(a) => a
       case Left(k) => k().runT
     }
+
+    def zip[B](tb: Trampoline[B]): Trampoline[(A, B)] =
+      (resume, tb.resume) match {
+        case (Right(a), Right(b)) => Done((a, b))
+        case (Left(a) , Left(b) ) => More(() => a() zip b())
+        case (Left(a) , Right(b)) => More(() => a() zip Done(b))
+        case (Right(a), Left(b) ) => More(() => Done(a) zip b())
+      }
   }
 
   case class More[+A](
@@ -99,4 +107,23 @@ object V2 {
   ) extends Trampoline[B]
 
 
+}
+
+object TrampolineAsFree {
+  sealed trait Free[S[+_], +A]
+
+  case class More[S[+_], +A](
+    k: S[Free[S, A]]
+  ) extends Free[S, A]
+
+  case class Done[S[+_], +A](
+    result: A
+  ) extends Free[S, A]
+
+  case class FlatMap[S[+_], A, +B](
+    sub: Free[S, A],
+    k: A => Free[S, B]
+  ) extends Free[S, B]
+
+  // Where Free == Trampoline where `type S[T] = () => T`
 }
