@@ -34,7 +34,9 @@ object ZipWithIndex {
           soFarIndexedList
       }
 
-    toIndexedList.runS(0).runT._1.reverse.map(_.swap)
+    val executionPlan = toIndexedList.runS(0)
+    println(executionPlan.printPlan)
+    executionPlan.runT._1.reverse.map(_.swap)
   }
 
   def zipIndexTailCallEliminated[A](as: List[A]): List[(A, Int)] =

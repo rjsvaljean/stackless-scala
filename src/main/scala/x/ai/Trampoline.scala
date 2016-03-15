@@ -22,6 +22,17 @@ object V1 {
 object V2 {
 
   sealed trait Trampoline[+A] {
+    def printPlan: String = {
+      def go(indent: Int, ta: Trampoline[A]): String =
+        ta.resume match {
+          case Right(o) => "\n" + (" " * indent) + o
+          case Left(f) =>
+            val f1 = f()
+            "\n" + (" " * indent) + f1 + go(indent + 2, f1)
+        }
+      go(0, this)
+    }
+
 
     def flatMap[B](f: A => Trampoline[B]): Trampoline[B] =
       this match {

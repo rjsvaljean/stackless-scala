@@ -22,8 +22,8 @@ object Main extends App {
       ),
     (
       (true, "or using trampolining"),
-      () => zipIndexV2(List.fill(10000)(1)),
-      List.fill(10000)(1).zipWithIndex
+      () => zipIndexV2(List.fill(10)(1)),
+      List.fill(10)(1).zipWithIndex
       ),
     (
       (true, "but it isn't universally applicably. Only to self recursive calls" +
